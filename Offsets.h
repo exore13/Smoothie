@@ -1,5 +1,5 @@
 //	Good Boi
-//	Source: https ://github.com/frk1/hazedumper/blob/master/csgo.hpp	
+//	Source: https://github.com/frk1/hazedumper/blob/master/csgo.hpp	
 //	Despues de cada update hace hace falta actualizar Offsets.h
 //	Ultima vez actualizado 2020-07-30 14:35:52.176057900 UTC
 
@@ -92,7 +92,6 @@
 #define m_vecViewOffset   0x108 
 #define m_viewPunchAngle   0x3020 
 
-// Signatures
 #define anim_overlays   0x2980 
 #define clientstate_choked_commands   0x4D28 
 #define clientstate_delta_ticks   0x174 
@@ -108,45 +107,45 @@
 #define dwClientState_PlayerInfo   0x52B8 
 #define dwClientState_State   0x108 
 #define dwClientState_ViewAngles   0x4D88 
-#define dwEntityList   0x4D534EC 
-#define dwForceAttack   0x3184A80 
-#define dwForceAttack2   0x3184A8C 
-#define dwForceBackward   0x3184A38 
-#define dwForceForward   0x3184A44 
-#define dwForceJump   0x51FD20C 
-#define dwForceLeft   0x3184A5C 
-#define dwForceRight   0x3184A50 
-#define dwGameDir   0x6296F8 
-#define dwGameRulesProxy   0x52704FC 
-#define dwGetAllClasses   0xD652CC 
+#define dwEntityList   0x4D5450C 
+#define dwForceAttack   0x3185AA0 
+#define dwForceAttack2   0x3185AAC 
+#define dwForceBackward   0x3185A58 
+#define dwForceForward   0x3185A64 
+#define dwForceJump   0x51FE22C 
+#define dwForceLeft   0x3185A7C 
+#define dwForceRight   0x3185A70 
+#define dwGameDir   0x629678 
+#define dwGameRulesProxy   0x527151C 
+#define dwGetAllClasses   0xD662BC 
 #define dwGlobalVars   0x58AAD8 
-#define dwGlowObjectManager   0x529B3C8 
-#define dwInput   0x51A4AC8 
-#define dwInterfaceLinkList   0x9077D4 
-#define dwLocalPlayer   0xD3EC6C 
-#define dwMouseEnable   0xD44810 
-#define dwMouseEnablePtr   0xD447E0 
-#define dwPlayerResource   0x3182DD0 
-#define dwRadarBase   0x518825C 
-#define dwSensitivity   0xD446AC 
-#define dwSensitivityPtr   0xD44680 
+#define dwGlowObjectManager   0x529C3D8 
+#define dwInput   0x51A5AE8 
+#define dwInterfaceLinkList   0x9087D4 
+#define dwLocalPlayer   0xD3FC5C 
+#define dwMouseEnable   0xD45800 
+#define dwMouseEnablePtr   0xD457D0 
+#define dwPlayerResource   0x3183DF0 
+#define dwRadarBase   0x518927C 
+#define dwSensitivity   0xD4569C 
+#define dwSensitivityPtr   0xD45670 
 #define dwSetClanTag   0x89FB0 
-#define dwViewMatrix   0x4D44E34 
-#define dwWeaponTable   0x51A5588 
+#define dwViewMatrix   0x4D45E54 
+#define dwWeaponTable   0x51A65A8 
 #define dwWeaponTableIndex   0x325C 
-#define dwYawPtr   0xD44470 
-#define dwZoomSensitivityRatioPtr   0xD49710 
-#define dwbSendPackets   0xD41DA 
+#define dwYawPtr   0xD45460 
+#define dwZoomSensitivityRatioPtr   0xD4A700 
+#define dwbSendPackets   0xD423A 
 #define dwppDirect3DDevice9   0xA7030 
-#define find_hud_element   0x27EF36A0 
-#define force_update_spectator_glow   0x3A2612 
+#define find_hud_element   0x27D64310 
+#define force_update_spectator_glow   0x3A3242 
 #define interface_engine_cvar   0x3E9EC 
-#define is_c4_owner   0x3AF0C0 
+#define is_c4_owner   0x3AFCD0 
 #define m_bDormant   0xED 
 #define m_flSpawnTime   0xA370 
 #define m_pStudioHdr   0x294C 
-#define m_pitchClassPtr   0x51884F8 
-#define m_yawClassPtr   0xD44470 
+#define m_pitchClassPtr   0x5189518 
+#define m_yawClassPtr   0xD45460 
 #define model_ambient_min   0x58DE4C 
-#define set_abs_angles   0x1D64E0 
-#define set_abs_origin   0x1D6320 
+#define set_abs_angles   0x1D7110 
+#define set_abs_origin   0x1D6F50 
