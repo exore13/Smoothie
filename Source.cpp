@@ -2,17 +2,28 @@
 //
 // Source: https://www.unknowncheats.me/forum/cs-go-releases/80163-counterstrike-global-offensive-complete-hack-tool-list.html
 #include <iostream>
+#include <string>
 #include <Windows.h>
+#include <map>
 #include <TlHelp32.h>
+#include <filesystem>
 #include "Offsets.h"
+#include <fstream>
+#pragma comment (lib, "urlmon.lib") 
 
-const std::string KVersion = "Alpha 0.2";
-const float KAlpha = 0.8f;
-const int KDelay = 150;
-const int KIterSleep = 5;
 
-bool glow, radar, endProgram;
-uintptr_t moduleBase;
+
+const std::string KVersion = "Alpha 0.2";	// Program version
+const float KAlpha = 0.8f;					// Transparency for the outline. Default 0.8f (80%)
+const int KDelay = 150;						// Time to wait after an input was detected.
+const int KIterSleep = 1;					// Time to wait(ms) after each iteration
+
+std::vector<std::string> wantedOffsets;		// Vector where will be the wanted offsets
+std::map<std::string, int> offsetsMap;		// Map used to store the offsets and their values
+bool glow, radar, endProgram;				// Status variables used across the program
+
+// Set of variables needed for memory reading and writing
+uintptr_t moduleBase;			
 DWORD procId;
 HWND hwnd;
 HANDLE hProcess;
@@ -72,10 +83,16 @@ struct glowStructLocal {
 	BYTE fullBloom = false;
 }glowLocal;
 
+
+
+
+// Helper module that will work as an alias to read local player for memory easier
 uintptr_t getLocalPlayer() {
-	return RPM<uintptr_t>(moduleBase + dwLocalPlayer);
+	return RPM<uintptr_t>(moduleBase + offsetsMap.at("dwLocalPlayer"));
 }
 
+
+// Helper module that will print out a kind of spash start screen
 void drawIntro()
 {
 	// Made using an online tool
@@ -100,6 +117,7 @@ void drawIntro()
 }
 
 
+// Helper module that will print out the program state
 void drawGlobal()
 {
 	// This code follows an asynchronous aproach to displaying information
@@ -122,28 +140,6 @@ void drawGlobal()
 	std::cout << "\n****************************************************\n";
 }
 
-void init()
-{
-	// Title set
-	std::string titleSet = "title Smoothie " + KVersion;
-	system(titleSet.c_str());
-
-	drawIntro();
-
-	// Initialize status vars
-	endProgram = false;
-	glow = true;
-	radar = true;
-
-	std::cout << "\tVersion " << KVersion << "\n";
-	std::cout << "\tPress RCTRL + LCTRL to initialize\n";
-	while (!GetAsyncKeyState(VK_LCONTROL) || !GetAsyncKeyState(VK_RCONTROL))
-		Sleep(500);
-
-	std::cout << "Nothing here, just a Smoothie :D\n\n";
-	Sleep(500);
-}
-
 
 // Gets the pointer to the adress of client.dll
 void getWindow()
@@ -154,6 +150,7 @@ void getWindow()
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS, NULL, procId);
 }
 
+
 // Modifies the memory to mark entities on the minimap as spotted
 void applyRadar(const int &lowerIndex, const int &upperIndex)
 {
@@ -163,24 +160,25 @@ void applyRadar(const int &lowerIndex, const int &upperIndex)
 	// I have not tested this, but memory access should be slower than accesing a variable
 	for (int i = lowerIndex; i < upperIndex; i++)
 	{
-		uintptr_t dwEntity = RPM<uintptr_t>(moduleBase + dwEntityList + i * 0x10);
+		uintptr_t dwEntity = RPM<uintptr_t>(moduleBase + offsetsMap.at("dwEntityList") + i * 0x10);
 		WPM<bool>(dwEntity + m_bSpotted, true);
 	}
 }
 
+
 // Modifies the memory to draw an outline around the players. Different from teammates to enemies
 void applyGlow()
 {
-	uintptr_t dwGlowManager = RPM<uintptr_t>(moduleBase + dwGlowObjectManager);
-	int LocalTeam = RPM<int>(getLocalPlayer() + m_iTeamNum);
+	uintptr_t dwGlowManager = RPM<uintptr_t>(moduleBase + offsetsMap.at("dwGlowObjectManager"));
+	int LocalTeam = RPM<int>(getLocalPlayer() + offsetsMap.at("m_iTeamNum"));
 	int i;
 
 	for (i = 1; i < 32; i++) {
-		uintptr_t dwEntity = RPM<uintptr_t>(moduleBase + dwEntityList + i * 0x10);
-		int EnmHealth = RPM<int>(dwEntity + m_iHealth); if (EnmHealth < 1 || EnmHealth > 150) continue;
-		int Dormant = RPM<int>(dwEntity + m_bDormant); if (Dormant) continue;
-		int iGlowIndx = RPM<int>(dwEntity + m_iGlowIndex);
-		int EntityTeam = RPM<int>(dwEntity + m_iTeamNum);
+		uintptr_t dwEntity = RPM<uintptr_t>(moduleBase + offsetsMap.at("dwEntityList") + i * 0x10);
+		int EnmHealth = RPM<int>(dwEntity + offsetsMap.at("m_iHealth")); if (EnmHealth < 1 || EnmHealth > 150) continue;
+		int Dormant = RPM<int>(dwEntity + offsetsMap.at("m_bDormant")); if (Dormant) continue;
+		int iGlowIndx = RPM<int>(dwEntity + offsetsMap.at("m_iGlowIndex"));
+		int EntityTeam = RPM<int>(dwEntity + offsetsMap.at("m_iTeamNum"));
 
 		if (LocalTeam == EntityTeam)
 		{
@@ -193,7 +191,7 @@ void applyGlow()
 
 		// Radar Hack
 		if (radar)
-			WPM<bool>(dwEntity + m_bSpotted, true);
+			WPM<bool>(dwEntity + offsetsMap.at("m_bSpotted"), true);
 	}
 
 	// If glow is ON also, we can take advantage of the dwEntity reads from the GLOW loop (1 - 32), then just keep going from here (32 - 63)
@@ -202,6 +200,7 @@ void applyGlow()
 		applyRadar(i, 64);
 	}
 }
+
 
 // Module in charge of key reads and status changes
 void inputManager()
@@ -270,26 +269,209 @@ void inputManager()
 	}
 }
 
+
+// Adds the entries to the wanted offsets vector. If you are willing to expand the code you will
+// have to add them manually here
+void prepareWantedOffsetsFilter()
+{
+	wantedOffsets.push_back(std::string("dwLocalPlayer"));
+	wantedOffsets.push_back(std::string("dwEntityList"));
+	wantedOffsets.push_back(std::string("dwGlowObjectManager"));
+	wantedOffsets.push_back(std::string("m_bSpotted"));
+	wantedOffsets.push_back(std::string("m_iTeamNum"));
+	wantedOffsets.push_back(std::string("m_iHealth"));
+	wantedOffsets.push_back(std::string("m_bDormant"));
+	wantedOffsets.push_back(std::string("m_iGlowIndex"));
+}
+
+// Checks if the given string is a wanted offset
+bool isOffsetWanted(const std::string& offset)
+{
+	for (const std::string& entry : wantedOffsets)
+		if (offset == entry)
+			return true;
+
+	return false;
+}
+
+
+// Reads from offsets.cfg and searches for the wanted vars, then inserts them on a map
+void readOffsets(const std::string& fileName)
+{
+	std::ifstream entryFile(fileName.c_str());
+	if (!entryFile.is_open())
+	{
+		std::cout << "Error trying to open file " << fileName << "\n";
+		return;
+	}
+
+	std::string dump, varName, varValue;
+	getline(entryFile, dump);
+	while (!entryFile.eof())
+	{
+		varName = dump.substr(0, dump.find_first_of(' '));
+		if (!isOffsetWanted(varName))
+		{
+			getline(entryFile, dump);
+			continue;
+		}
+
+		varValue = dump.substr(dump.find_last_of(' ')+1);
+
+		offsetsMap.insert( std::pair <std::string, int>(varName, stoi(varValue)) );
+		getline(entryFile, dump);
+	}
+
+	entryFile.close();
+}
+
+
+// Checks local directory if there is a file
+bool checkLocalOffsets(const char* targetStr)
+{
+	// INFO
+	// https://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-directory-using-c-or-c
+	// https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-wsprintfa
+	TCHAR path[MAX_PATH], target[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, path);
+
+	wsprintfA(target, TEXT(targetStr), path);
+	for (const auto& entry : std::filesystem::directory_iterator(path))
+	{
+		if (entry.path().string() == target) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+// Looks for an older offsets.cfg file. If there is one, it changes it's name to offsets.cfg.old. If there
+// is already an offsets.cfg.old file, it delets it
+void checkOldOffsets()
+{
+	// If there is no old offsets file, return
+	if (!checkLocalOffsets("%s\\offsets.cfg"))
+	{
+		return;
+	}
+
+
+	if (checkLocalOffsets("%s\\offsets.cfg.old"))
+	{
+		system("del offsets.cfg.old");
+	}
+
+	system("rename offsets.cfg offsets.cfg.old");
+}
+
+
+// Tries to download the latest version of csgo offsets from hazedumper's github. If the download fails
+// it prints the error and tries to read the offsets from a older local file
+bool getOffsets()
+{
+	// INFO
+	// https://stackoverflow.com/questions/5184988/should-i-use-urldownloadtofile
+	// https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms775123(v=vs.85)
+
+	TCHAR url[] = TEXT("https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.toml");
+	TCHAR path[MAX_PATH];
+
+	GetCurrentDirectory(MAX_PATH, path);
+	wsprintf(path, TEXT("%s\\offsets.cfg"), path);	// Adds the offset filename to the absolute path
+
+	checkOldOffsets();		// If there is a old file, saves it as offsets.cfg.old
+
+	HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);	// Downloads the file from the url
+
+
+	if (res == S_OK) {		// Download suscessfull
+		readOffsets((std::string)path);
+	}
+
+	else {					// Downlaod Failed
+		std::cout << "Error trying to download new offsets file\n\n" << res << "\n\nTrying to read old offsets from local file\n";
+
+		if (checkLocalOffsets("%s\\offsets.cfg.old")) {
+			TCHAR filename[MAX_PATH];
+			GetCurrentDirectory(MAX_PATH, filename);
+			wsprintf(filename, TEXT("%s\\offsets.cfg.old"), filename);
+
+			readOffsets((std::string)filename);
+		}
+
+		else
+		{ 
+			std::cout << "No local offsets were found. Program could not continue\n";
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+// Main initialization module. Sets some decorations and prepares the code to run
+bool init()
+{
+	// Title decoration set
+	std::string titleSet = "title Smoothie " + KVersion;
+	system(titleSet.c_str());
+
+	// Draws the intro splash
+	drawIntro();
+
+
+	// Prepares an array with a wanted offset name on each entry
+	prepareWantedOffsetsFilter();
+
+	// Tries to get/update the offsets
+	if (!getOffsets()) 
+	{
+		return false;	// Error downloading and no local offset file. Program not working
+	}
+
+	// Links to csgo
+	getWindow();
+
+	// Initialize status vars
+	endProgram = false;
+	glow = true;
+	radar = true;
+
+	std::cout << "\tVersion " << KVersion << "\n";
+	std::cout << "\tPress RCTRL + LCTRL to initialize\n";
+	while (!GetAsyncKeyState(VK_LCONTROL) || !GetAsyncKeyState(VK_RCONTROL))
+		Sleep(500);
+
+	std::cout << "\n\tNothing here, just a Smoothie :D\n\n";
+	Sleep(500);
+	return true;
+}
+
+
+
 int main() {
 
-	init();
-	getWindow();
-	drawGlobal();
-
-	while (!endProgram)
+	if (init())
 	{
-		if (glow)				// GLOW
-			applyGlow();	
-		
-		if (radar && !glow)		// RADAR	
-			applyRadar(1, 64);
-		
-		inputManager();
-		Sleep(KIterSleep);
+		drawGlobal();
+
+		while (!endProgram)
+		{
+			if (glow)
+				applyGlow();
+
+			if (radar && !glow)	
+				applyRadar(1, 64);
+
+			inputManager();
+			Sleep(KIterSleep);
+		}
 	}
 
 	std::cout << "\n\t@ End @\n";
-	getchar();
 
 	exit(0);
 }
