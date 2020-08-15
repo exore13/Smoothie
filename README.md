@@ -19,7 +19,7 @@ Simple wallhack and radarhack for CSGO.
 
 _Smoothie_ is just an experiment. It is not meant to be use to gain advantage on online games. 
 It was built out of curiosity of how reading and writing memory on windows works and testing Valve's Anticheat measures on this game. 
-As context, I've played around 3k hours of CS 1.6 and CSS around cybercafes and pirated versions, and 1.5k hours of CSGO on my main Steam Accout. I know a few tricks around the source engine and decided to experiment a litle bit more with it.
+As context, I've played around 3k hours of CS 1.6 and CSS around cybercafes and pirated versions, and 1.5k hours of CSGO on my main Steam Account. I know a few tricks around the source engine and decided to experiment a litle bit more with it.
 
 The program just gets the memory address of CSGO's client.dll and using offsets it can read and write directly from memory.
 The offsets change with each game update, so to ensure this program still works, I've put a feature that autoupdates the offsets each time the program launches, based on [frk1/hazedumper](https://github.com/frk1/hazedumper)'s repository.
@@ -37,7 +37,7 @@ To build Smoothie:
 - Set on Project Properties Character Set to `Use Multi-Byte Character Set`.
 
 To use Smoothie:
-- Download the latest compiled version: [MEGA](https://mega.nz/folder/yyAXiIhB#RBZJv9kRIS7KGkS9g3e8og)
+- Download the latest compiled version: [MEGA](https://mega.nz/folder/yyAXiIhB#RBZJv9kRIS7KGkS9g3e8og) Password = exore13
 - Install Microsoft VC Redist 2015 x86.
 - Launch Smoothie as Administrator and CSGO. Order doesn't matters.
 - Once both Smoothie and CSGO are launched. Press LeftControl + RightControl to Start.
