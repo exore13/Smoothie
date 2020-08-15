@@ -1,6 +1,7 @@
 # Smoothie
 
 ![Smoothie image](https://i.imgur.com/c2KcIwK.png)
+
 Simple wallhack and radarhack for CSGO.
 
 - [Description](#Description)
@@ -38,16 +39,20 @@ To build Smoothie:
 To use Smoothie:
 - Download the latest compiled version: [MEGA](https://mega.nz/folder/yyAXiIhB#RBZJv9kRIS7KGkS9g3e8og)
 - Install Microsoft VC Redist 2015 x86.
-- Launch Smoothie and CSGO. Order doesn't matters.
+- Launch Smoothie as Administrator and CSGO. Order doesn't matters.
 - Once both Smoothie and CSGO are launched. Press LeftControl + RightControl to Start.
 - Smoothie is ready to use.
+
 ![Smoothie menu image](https://i.imgur.com/lpm645k.png?1)
 
 ## Screenshots
 
 ![Screenshot 1](https://i.imgur.com/qXs42vE.png)
+
 ![Screenshot 2](https://i.imgur.com/XvXPiE9.png)
+
 ![Screenshot 3](https://i.imgur.com/P6Z5zRD.png)
+
 ![Screenshot 4](https://i.imgur.com/ziyNkCR.png)
 
 ## Requirements
