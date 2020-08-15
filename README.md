@@ -10,10 +10,10 @@ Simple wallhack and radarhack for CSGO.
 - [Requirements](#Requirements)
 - [Credits](#Credits)
 
-
-- ⛔ Not meant to use to gain advantage on online matches.
-- ⚠️ We are not liable for VAC bans in case of incorrect use.
-
+```
+    ⛔ Not meant to use to gain advantage on online matches.
+    ⚠️ We are not liable for VAC bans in case of incorrect use.
+```
 
 ## Description
 
