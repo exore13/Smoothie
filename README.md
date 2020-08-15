@@ -1,6 +1,7 @@
 # Smoothie
 
 ![Smoothie image](https://i.imgur.com/c2KcIwK.png)
+
 Simple wallhack and radarhack for CSGO.
 
 - [Description](#Description)
@@ -41,6 +42,7 @@ To use Smoothie:
 - Launch Smoothie and CSGO. Order doesn't matters.
 - Once both Smoothie and CSGO are launched. Press LeftControl + RightControl to Start.
 - Smoothie is ready to use.
+
 ![Smoothie menu image](https://i.imgur.com/lpm645k.png?1)
 
 ## Screenshots
