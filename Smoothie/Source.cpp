@@ -13,7 +13,7 @@
 
 
 
-const std::string KVersion = "Alpha 0.2";	// Program version
+const std::string KVersion = "Alpha 0.3";	// Program version
 const float KAlpha = 0.8f;					// Transparency for the outline. Default 0.8f (80%)
 const int KDelay = 150;						// Time to wait after an input was detected.
 const int KIterSleep = 1;					// Time to wait(ms) after each iteration
