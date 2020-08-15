@@ -7,8 +7,8 @@
 #include <map>
 #include <TlHelp32.h>
 #include <filesystem>
-#include "Offsets.h"
 #include <fstream>
+#include <vector>
 #pragma comment (lib, "urlmon.lib") 
 
 
@@ -23,7 +23,7 @@ std::map<std::string, int> offsetsMap;		// Map used to store the offsets and the
 bool glow, radar, endProgram;				// Status variables used across the program
 
 // Set of variables needed for memory reading and writing
-uintptr_t moduleBase;			
+uintptr_t moduleBase;
 DWORD procId;
 HWND hwnd;
 HANDLE hProcess;
@@ -43,6 +43,8 @@ uintptr_t GetModuleBaseAddress(const char* modName) {
 			} while (Module32Next(hSnap, &modEntry));
 		}
 	}
+
+	return NULL;
 }
 
 // Read process memory template
@@ -152,7 +154,7 @@ void getWindow()
 
 
 // Modifies the memory to mark entities on the minimap as spotted
-void applyRadar(const int &lowerIndex, const int &upperIndex)
+void applyRadar(const int& lowerIndex, const int& upperIndex)
 {
 	// upperIndex should be the max number of entities to draw, tried 64 and 32 and both worked fine
 	// Maybe a higher number count could be usefull in community servers with higher max player cap
@@ -161,7 +163,7 @@ void applyRadar(const int &lowerIndex, const int &upperIndex)
 	for (int i = lowerIndex; i < upperIndex; i++)
 	{
 		uintptr_t dwEntity = RPM<uintptr_t>(moduleBase + offsetsMap.at("dwEntityList") + i * 0x10);
-		WPM<bool>(dwEntity + m_bSpotted, true);
+		WPM<bool>(dwEntity + offsetsMap.at("m_bSpotted"), true);
 	}
 }
 
@@ -316,9 +318,9 @@ void readOffsets(const std::string& fileName)
 			continue;
 		}
 
-		varValue = dump.substr(dump.find_last_of(' ')+1);
+		varValue = dump.substr(dump.find_last_of(' ') + 1);
 
-		offsetsMap.insert( std::pair <std::string, int>(varName, stoi(varValue)) );
+		offsetsMap.insert(std::pair <std::string, int>(varName, stoi(varValue)));
 		getline(entryFile, dump);
 	}
 
@@ -402,7 +404,7 @@ bool getOffsets()
 		}
 
 		else
-		{ 
+		{
 			std::cout << "No local offsets were found. Program could not continue\n";
 			return false;
 		}
@@ -427,7 +429,7 @@ bool init()
 	prepareWantedOffsetsFilter();
 
 	// Tries to get/update the offsets
-	if (!getOffsets()) 
+	if (!getOffsets())
 	{
 		return false;	// Error downloading and no local offset file. Program not working
 	}
@@ -463,7 +465,7 @@ int main() {
 			if (glow)
 				applyGlow();
 
-			if (radar && !glow)	
+			if (radar && !glow)
 				applyRadar(1, 64);
 
 			inputManager();
